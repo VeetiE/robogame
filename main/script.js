@@ -4,6 +4,8 @@ let paddle_width = 80;
 let paddle_height = 30;
 var robolist = [];
 var robotimer
+var lives_left = 5
+var points = 0
 
 class Robot {
     constructor() {
@@ -11,8 +13,8 @@ class Robot {
         this.Y = windowWidth / 3 / 2
         this.speedX = random(1,4)
         this.speedY = random(-2,-4)
-        this.width = 60
-        this.height = 60
+        this.width = 40
+        this.height = 40
         this.angle = 0
     }
     move(){
@@ -24,7 +26,10 @@ class Robot {
             }
         }
         this.Y = this.Y + this.speedY
-        image(robot, this.X, this.Y, 30, 30)
+        this.angle = this.angle + 1
+        push()
+        image(robot, this.X, this.Y, this.width, this.height)
+        pop()
     }
 }
 
@@ -35,6 +40,7 @@ function preload() {
 function setup() {
     var canvas = createCanvas(windowWidth, windowWidth / 3);
     canvas.parent("robogame")
+    angleMode(DEGREES)
 }
 function draw() {
     background("white")
@@ -42,6 +48,15 @@ function draw() {
     create_paddle()
     robolist.forEach(function(robot, which){
         robot.move()
+        if (robot.Y > windowWidth / 3) {
+            robolist.splice(which, 1)
+            lives_left = lives_left - 1
+            console.log(lives_left)
+        }
+        if (robot.X > windowWidth) {
+            robolist.splice(which, 1)
+            points = points + 1
+        }
     })
 }
 function create_paddle() {
@@ -58,4 +73,14 @@ function play(){
     clearTimeout(robotimer)
     loop()
     create_robots()
+}
+function gameOver() {
+    clearTimeout(robotimer)
+    noLoop()
+    push()
+    fill("white")
+    textSize(50)
+    textAlign(CENTER)
+    text("GAME OVER", windowWidth / 2, windowWidth / 6)
+    pop()
 }
